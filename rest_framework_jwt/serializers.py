@@ -33,7 +33,7 @@ class JSONWebTokenSerializer(Serializer):
         """
         super(JSONWebTokenSerializer, self).__init__(*args, **kwargs)
 
-        self.fields[self.username_field] = serializers.CharField()
+        self.fields['email'] = serializers.CharField()
         self.fields['password'] = PasswordField(write_only=True)
 
     @property
@@ -41,8 +41,14 @@ class JSONWebTokenSerializer(Serializer):
         return get_username_field()
 
     def validate(self, attrs):
+        try:
+            user = get_user_model().objects.get(email__iexact=attrs.get('email'))
+        except get_user_model().DoesNotExist:
+            msg = _('Unable to log in with provided credentials.')
+            raise serializers.ValidationError(msg)
+
         credentials = {
-            self.username_field: attrs.get(self.username_field),
+            self.username_field: user.username,
             'password': attrs.get('password')
         }
 
