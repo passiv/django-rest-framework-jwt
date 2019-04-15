@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
+from django.contrib.auth.signals import user_logged_in
 from datetime import datetime
 
 from .settings import api_settings
@@ -57,6 +58,7 @@ class JSONWebTokenAPIView(APIView):
         if serializer.is_valid():
             user = serializer.object.get('user') or request.user
             token = serializer.object.get('token')
+            user_logged_in.send(sender=user.__class__, request=request, user=user)
             response_data = jwt_response_payload_handler(token, user, request)
             response = Response(response_data)
             if api_settings.JWT_AUTH_COOKIE:
