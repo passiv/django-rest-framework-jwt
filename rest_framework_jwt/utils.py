@@ -29,7 +29,7 @@ def jwt_get_secret_key(payload=None):
     return api_settings.JWT_SECRET_KEY
 
 
-def jwt_payload_handler(user):
+def jwt_payload_handler(user, expiration_delta=None):
     username_field = get_username_field()
     username = get_username(user)
 
@@ -39,10 +39,13 @@ def jwt_payload_handler(user):
         DeprecationWarning
     )
 
+    if expiration_delta is None:
+        expiration_delta = api_settings.JWT_EXPIRATION_DELTA
+
     payload = {
         'user_id': user.pk,
         'username': username,
-        'exp': datetime.utcnow() + api_settings.JWT_EXPIRATION_DELTA
+        'exp': datetime.utcnow() + expiration_delta
     }
     if hasattr(user, 'email'):
         payload['email'] = user.email
