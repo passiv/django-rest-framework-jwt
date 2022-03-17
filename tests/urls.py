@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 from django.http import HttpResponse
 from rest_framework import permissions
 from rest_framework.views import APIView
@@ -25,16 +25,16 @@ class MockView(APIView):
 
 
 urlpatterns = [
-    url(r'^auth-token/$', views.obtain_jwt_token),
-    url(r'^auth-token-refresh/$', views.refresh_jwt_token),
-    url(r'^auth-token-verify/$', views.verify_jwt_token),
+    path('auth-token/', views.obtain_jwt_token),
+    path('auth-token-refresh/', views.refresh_jwt_token),
+    path('auth-token-verify/', views.verify_jwt_token),
 
-    url(r'^jwt/$', MockView.as_view(
+    path('jwt/', MockView.as_view(
         authentication_classes=[JSONWebTokenAuthentication])),
-    url(r'^jwt-oauth2/$', MockView.as_view(
+    path('jwt-oauth2/', MockView.as_view(
         authentication_classes=[
             JSONWebTokenAuthentication, OAuth2Authentication])),
-    url(r'^oauth2-jwt/$', MockView.as_view(
+    path('oauth2-jwt/', MockView.as_view(
         authentication_classes=[
             OAuth2Authentication, JSONWebTokenAuthentication])),
 ]
